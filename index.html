@@ -1,0 +1,2518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameCreators Academy - Módulo 1: Fundamentos de Programação + Git</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2196F3;
+            --secondary: #4CAF50;
+            --accent: #FF9800;
+            --light-bg: #F8F9FA;
+            --dark-text: #212529;
+            --dark-header: #1A1A2E;
+            --white: #FFFFFF;
+            --success: #28A745;
+            --warning: #FFC107;
+            --error: #DC3545;
+            --shadow-light: rgba(33, 150, 243, 0.1);
+            --shadow-medium: rgba(33, 150, 243, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-card {
+            background: var(--white);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--dark-text);
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-text);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #E9ECEF;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .login-button {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(33, 150, 243, 0.3);
+        }
+
+        .admin-button {
+            background: var(--accent);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .error-message {
+            background: rgba(220, 53, 69, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .success-message {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .admin-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .ra-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #E9ECEF;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .ra-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #F1F3F4;
+        }
+
+        .ra-item:last-child {
+            border-bottom: none;
+        }
+
+        .ra-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .ra-status.approved {
+            background: rgba(40, 167, 69, 0.2);
+            color: var(--success);
+        }
+
+        .ra-status.pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: var(--warning);
+        }
+
+        .approve-button {
+            background: var(--success);
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* Main Application */
+        .main-header {
+            background: var(--dark-header);
+            color: white;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .user-ra {
+            background: rgba(33, 150, 243, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .logout-button {
+            background: var(--error);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .progress-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            width: 100px;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.5s ease;
+        }
+
+        .level-badge {
+            background: var(--accent);
+            color: var(--dark-text);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr 280px;
+            gap: 2rem;
+            padding: 2rem;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Curriculum Sidebar */
+        .curriculum-sidebar {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: fit-content;
+            box-shadow: 0 4px 20px var(--shadow-light);
+            border: 1px solid rgba(33, 150, 243, 0.1);
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .module-section {
+            margin-bottom: 2rem;
+        }
+
+        .module-title {
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: var(--light-bg);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .lesson-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .lesson-item:hover {
+            background: rgba(33, 150, 243, 0.05);
+            border-color: var(--primary);
+            transform: translateX(2px);
+        }
+
+        .lesson-item.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+
+        .lesson-item.completed {
+            background: rgba(40, 167, 69, 0.1);
+            border-color: var(--success);
+        }
+
+        .lesson-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .lesson-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .lesson-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .lesson-title {
+            font-size: 0.85rem;
+            font-weight: 500;
+            line-height: 1.3;
+            margin-bottom: 0.2rem;
+        }
+
+        .lesson-duration {
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        .lesson-status {
+            flex-shrink: 0;
+            font-size: 1rem;
+        }
+
+        /* Content Area */
+        .content-area {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow-light);
+            border: 1px solid rgba(33, 150, 243, 0.1);
+            overflow: hidden;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .content-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .content-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .content-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content-body {
+            padding: 2rem;
+        }
+
+        /* Code Mentor Section */
+        .mentor-section {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(76, 175, 80, 0.1));
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--primary);
+        }
+
+        .mentor-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .mentor-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .mentor-info h3 {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .mentor-info p {
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        .audio-player {
+            background: rgba(255,255,255,0.8);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .audio-btn {
+            background: var(--primary);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .audio-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .audio-timeline {
+            flex: 1;
+            height: 6px;
+            background: rgba(33, 150, 243, 0.2);
+            border-radius: 3px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .speaking-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .speaking-indicator.active {
+            display: flex;
+        }
+
+        .wave {
+            width: 4px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 2px;
+            animation: wave 1s infinite ease-in-out;
+        }
+
+        .wave:nth-child(2) { animation-delay: 0.1s; }
+        .wave:nth-child(3) { animation-delay: 0.2s; }
+        .wave:nth-child(4) { animation-delay: 0.3s; }
+
+        @keyframes wave {
+            0%, 40%, 100% { transform: scaleY(0.4); }
+            20% { transform: scaleY(1); }
+        }
+
+        /* Content Sections */
+        .content-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .section-title:hover {
+            color: var(--secondary);
+        }
+
+        .concept-card {
+            background: var(--light-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .concept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-light);
+        }
+
+        .concept-title {
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .concept-explanation {
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .concept-example {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--secondary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Code Simulator */
+        .interactive-simulator {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.05), rgba(76, 175, 80, 0.05));
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--primary);
+        }
+
+        .simulator-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .simulator-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .simulator-content {
+            min-height: 300px;
+            background: var(--white);
+            border-radius: 8px;
+            padding: 1.5rem;
+            border: 1px solid rgba(33, 150, 243, 0.2);
+        }
+
+        .sim-button {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+        }
+
+        .sim-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+
+        /* Portfolio Section */
+        .portfolio-section {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.1), rgba(76, 175, 80, 0.1));
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 2px solid var(--primary);
+        }
+
+        .git-folder {
+            background: var(--white);
+            border: 2px solid var(--secondary);
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .git-folder-title {
+            font-weight: 600;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Materials and Activities Sections */
+        .materials-section, .activities-section, .quiz-section {
+            background: rgba(255, 152, 0, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border: 1px solid var(--accent);
+        }
+
+        .activities-section {
+            background: rgba(40, 167, 69, 0.1);
+            border-color: var(--success);
+        }
+
+        .material-item, .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--white);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .material-item:hover, .activity-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+
+        .activity-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--success);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .activity-checkbox.checked {
+            background: var(--success);
+            color: white;
+        }
+
+        /* Quiz Section */
+        .quiz-question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--dark-text);
+        }
+
+        .quiz-option {
+            background: var(--white);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .quiz-option.selected {
+            border-color: var(--accent);
+            background: rgba(255, 152, 0, 0.2);
+        }
+
+        .quiz-option.correct {
+            border-color: var(--success);
+            background: rgba(40, 167, 69, 0.2);
+        }
+
+        .quiz-option.incorrect {
+            border-color: var(--error);
+            background: rgba(220, 53, 69, 0.2);
+        }
+
+        /* Progress Sidebar */
+        .progress-sidebar {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1.5rem;
+            height: fit-content;
+            box-shadow: 0 4px 20px var(--shadow-light);
+            border: 1px solid rgba(33, 150, 243, 0.1);
+        }
+
+        .progress-header {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--light-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 0.3rem;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .achievement-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid;
+        }
+
+        .achievement-badge.unlocked {
+            background: linear-gradient(45deg, var(--accent), #FF5722);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .achievement-badge.locked {
+            background: #ddd;
+            border-color: #bbb;
+            color: #888;
+        }
+
+        .achievement-badge:hover.unlocked {
+            transform: scale(1.1);
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--light-bg);
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px var(--shadow-light);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-medium);
+        }
+
+        .nav-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .curriculum-sidebar,
+            .progress-sidebar {
+                order: 2;
+                max-height: none;
+            }
+            
+            .content-area {
+                order: 1;
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .content-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <h1 class="login-title">🎮 GameCreators Academy</h1>
+            <p class="login-subtitle">Módulo 1: Fundamentos de Programação + Git</p>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="raInput">Registro Acadêmico (RA)</label>
+                    <input type="text" id="raInput" class="form-input" placeholder="Digite seu RA" required>
+                </div>
+                
+                <button type="submit" class="login-button">
+                    🚀 Acessar Curso
+                </button>
+                
+                <button type="button" class="admin-button" onclick="showAdminPanel()">
+                    ⚙️ Painel Admin
+                </button>
+            </form>
+            
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="login-screen hidden">
+        <div class="admin-panel">
+            <h2 class="admin-title">🔐 Painel Administrativo</h2>
+            
+            <div class="form-group">
+                <label class="form-label" for="adminPassword">Senha de Admin</label>
+                <input type="password" id="adminPassword" class="form-input" placeholder="Digite a senha">
+            </div>
+            
+            <button onclick="verifyAdminPassword()" class="login-button">
+                🔓 Acessar Painel
+            </button>
+            
+            <div id="adminContent" class="hidden">
+                <h3 style="color: var(--primary); margin: 1.5rem 0 1rem 0;">📋 Gerenciar RAs</h3>
+                
+                <div class="form-group">
+                    <label class="form-label" for="newRA">Novo RA para Aprovar</label>
+                    <input type="text" id="newRA" class="form-input" placeholder="Digite o RA">
+                    <button onclick="approveRA()" class="sim-button" style="margin-top: 0.5rem;">
+                        ✅ Aprovar RA
+                    </button>
+                </div>
+                
+                <div class="ra-list" id="raList">
+                    <p style="text-align: center; color: #666;">Carregando lista de RAs...</p>
+                </div>
+            </div>
+            
+            <button onclick="closeAdminPanel()" class="admin-button" style="margin-top: 1rem;">
+                ← Voltar
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden">
+        <header class="main-header">
+            <div class="header-content">
+                <div class="logo">🎮 GameCreators Academy - Módulo 1</div>
+                <div class="user-info">
+                    <div class="progress-info">
+                        <div class="progress-item">
+                            <span>XP:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="headerXpBar" style="width: 0%"></div>
+                            </div>
+                            <span id="headerXpText">0/1000</span>
+                        </div>
+                        <div class="progress-item">
+                            <span>Progresso:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="headerProgressBar" style="width: 0%"></div>
+                            </div>
+                            <span id="headerProgressText">0/8</span>
+                        </div>
+                        <div class="level-badge" id="headerLevel">LEVEL 1</div>
+                    </div>
+                    <div class="user-ra" id="userRA">RA: 000000</div>
+                    <button class="logout-button" onclick="logout()">🚪 Sair</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <!-- Sidebar Esquerda - Currículo -->
+            <aside class="curriculum-sidebar">
+                <h2 class="sidebar-header">📚 Fundamentos de Programação + Git</h2>
+                
+                <div class="module-section">
+                    <div class="module-title">🐍 Python + Git Basics</div>
+                    <div id="module1Lessons">
+                        <!-- Lessons will be populated by JavaScript -->
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Área Principal de Conteúdo -->
+            <main class="content-area">
+                <div class="content-header">
+                    <h1 class="content-title" id="lessonTitle">Bem-vindo ao GameCreators Academy</h1>
+                    <p class="content-subtitle" id="lessonSubtitle">Sua jornada em programação Python + Git para Games começa aqui!</p>
+                </div>
+
+                <div class="content-body">
+                    <!-- Code Mentor -->
+                    <div class="mentor-section">
+                        <div class="mentor-header">
+                            <div class="mentor-avatar">🤖</div>
+                            <div class="mentor-info">
+                                <h3>PyBot - Seu Mentor Python</h3>
+                                <p>Assistente Inteligente para Programação Python + Git</p>
+                            </div>
+                        </div>
+                        
+                        <div class="audio-player">
+                            <div class="audio-controls">
+                                <button class="audio-btn" id="playBtn" title="Reproduzir/Pausar">▶️</button>
+                                <button class="audio-btn" id="stopBtn" title="Parar">⏹️</button>
+                                <div class="audio-timeline" id="audioTimeline">
+                                    <div class="progress-fill" id="audioProgress" style="width: 0%"></div>
+                                </div>
+                                <button class="audio-btn" id="speedBtn" title="Velocidade">1x</button>
+                                <button class="audio-btn" id="readAllBtn" title="Ler toda a lição">📖</button>
+                            </div>
+                            
+                            <div class="speaking-indicator" id="speakingIndicator">
+                                <span>PyBot está explicando...</span>
+                                <div class="wave"></div>
+                                <div class="wave"></div>
+                                <div class="wave"></div>
+                                <div class="wave"></div>
+                            </div>
+                            
+                            <p style="margin-top: 1rem; font-style: italic;" id="mentorMessage">
+                                Olá! Eu sou o PyBot, seu mentor em Python. Clique em qualquer seção ou no botão "Ler toda a lição" para eu explicar o conteúdo!
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Objetivo da Lição -->
+                    <div class="content-section">
+                        <h2 class="section-title" onclick="speakObjective()">🎯 Objetivo da Lição</h2>
+                        <div class="concept-card" onclick="speakObjective()">
+                            <div class="concept-explanation" id="lessonObjective">
+                                Carregando objetivos da lição...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conceitos Fundamentais -->
+                    <div class="content-section" id="conceptsSection">
+                        <h2 class="section-title" onclick="speakSection('concepts')">📖 Conceitos Fundamentais</h2>
+                        <div id="conceptsContent">
+                            <!-- Concepts will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Simulador de Código -->
+                    <div class="interactive-simulator" id="simulator">
+                        <div class="simulator-header">
+                            <h3 class="simulator-title" id="simTitle">💻 Simulador de Código</h3>
+                            <p id="simDescription">Pratique programação Python de forma interativa</p>
+                        </div>
+                        <div class="simulator-content" id="simContent">
+                            <p>Carregando simulador...</p>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio Section -->
+                    <div class="portfolio-section" id="portfolioSection">
+                        <h2 class="section-title">💼 Construindo seu Portfolio</h2>
+                        <div id="portfolioContent">
+                            <!-- Portfolio items will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Materiais Complementares -->
+                    <div class="materials-section">
+                        <h2 class="section-title">📄 Materiais Complementares</h2>
+                        <div id="materialsList">
+                            <!-- Materials will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Atividades Práticas -->
+                    <div class="activities-section">
+                        <h2 class="section-title">✅ Atividades Práticas</h2>
+                        <div id="activitiesList">
+                            <!-- Activities will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Quiz -->
+                    <div class="quiz-section" id="quizSection" style="display: none;">
+                        <h2 class="section-title">🧠 Quiz de Conhecimento</h2>
+                        <div class="quiz-question" id="quizQuestion"></div>
+                        <div id="quizOptions"></div>
+                        <button class="sim-button" id="submitQuiz" style="margin-top: 1rem;">Confirmar Resposta</button>
+                    </div>
+
+                    <!-- Navegação entre Lições -->
+                    <div class="nav-buttons">
+                        <button class="nav-button" id="prevLessonBtn" onclick="navigateLesson(-1)" style="display: none;">
+                            ⬅️ Lição Anterior
+                        </button>
+                        <div style="flex: 1;"></div>
+                        <button class="nav-button" id="nextLessonBtn" onclick="navigateLesson(1)">
+                            Próxima Lição ➡️
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Sidebar Direita - Progresso -->
+            <aside class="progress-sidebar">
+                <h2 class="progress-header">📊 Seu Progresso</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalXP">0</div>
+                        <div class="stat-label">Total XP</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="completedLessons">0</div>
+                        <div class="stat-label">Lições</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="streakDays">0</div>
+                        <div class="stat-label">Sequência</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="portfolioItems">0</div>
+                        <div class="stat-label">Portfolio</div>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--primary); margin-bottom: 1rem; font-size: 1rem;">🏆 Conquistas</h3>
+                <div class="achievements-grid" id="achievementsGrid">
+                    <!-- Achievements will be populated by JavaScript -->
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem; font-size: 1rem;">📈 Progresso Semanal</h3>
+                    <div style="background: var(--light-bg); padding: 1rem; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 1.2rem; font-weight: 600; color: var(--success);" id="weeklyProgress">1/8 lições</div>
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Módulo 1 - Python + Git</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // 8 Lições completas do Módulo 1 - Fundamentos de Programação + Git
+        const lessons = [
+            {
+                id: 1,
+                title: "🎓 Introdução à Lógica + Primeiro Python",
+                subtitle: "Descobrindo o Mundo da Programação",
+                duration: "30 min",
+                icon: "🐍",
+                objective: "Compreender os fundamentos da lógica de programação e executar seus primeiros comandos Python.",
+                concepts: [
+                    {
+                        title: "O que é Programação?",
+                        explanation: "Programação é a arte de dar instruções precisas ao computador para resolver problemas. É como escrever uma receita detalhada que o computador pode seguir.",
+                        example: "print('Olá, mundo!') # Seu primeiro programa Python"
+                    },
+                    {
+                        title: "Lógica de Programação",
+                        explanation: "Lógica é a sequência de passos para resolver um problema. Todo programa segue: Entrada → Processamento → Saída.",
+                        example: "nome = input('Digite seu nome: ')\nprint(f'Olá, {nome}!')\n# Entrada: nome do usuário\n# Processamento: formatação\n# Saída: saudação"
+                    }
+                ],
+                materials: [
+                    "📖 Guia: História do Python",
+                    "🎥 Vídeo: Instalando Python e VSCode",
+                    "📊 Cheat Sheet: Comandos Python Básicos",
+                    "🔗 Links: Recursos Online Python"
+                ],
+                portfolio: {
+                    title: "projeto_base.py",
+                    description: "Crie seu primeiro arquivo Python com print statements, comentários e uma saudação personalizada.",
+                    gitFolder: "Licao01_Projeto_Base"
+                },
+                activities: [
+                    "Instalar Python 3.x no computador",
+                    "Configurar VSCode com extensão Python",
+                    "Criar arquivo projeto_base.py",
+                    "Executar primeiro programa com print()"
+                ],
+                quiz: {
+                    question: "Qual comando Python exibe texto na tela?",
+                    options: ["show('texto')", "display('texto')", "print('texto')", "write('texto')"],
+                    correct: 2
+                },
+                simulator: "python-basic"
+            },
+            {
+                id: 2,
+                title: "📦 Variáveis e Tipos de Dados + Git Básico",
+                subtitle: "Armazenando Informações e Versionando Código",
+                duration: "35 min",
+                icon: "💾",
+                objective: "Dominar variáveis Python, tipos de dados e inicializar controle de versão com Git.",
+                concepts: [
+                    {
+                        title: "Variáveis e Tipos",
+                        explanation: "Variáveis são 'caixas' que armazenam dados. Python tem tipos: int (números), str (texto), float (decimais), bool (verdadeiro/falso).",
+                        example: "nome = 'TechStore'  # string\npreco = 29.99       # float\nquantidade = 10     # int\ndisponivel = True   # boolean"
+                    },
+                    {
+                        title: "Controle de Versão com Git",
+                        explanation: "Git rastreia mudanças no código. Permite voltar versões anteriores, trabalhar em equipe e manter histórico completo.",
+                        example: "git init\ngit add .\ngit commit -m 'Primeiro commit: variáveis de produtos'\n# Salva estado atual do projeto"
+                    }
+                ],
+                materials: [
+                    "📥 Git: Download e Instalação",
+                    "🎮 Tutorial: Git Comandos Essenciais",
+                    "📋 Cheat Sheet: Tipos de Dados Python",
+                    "🎥 Vídeo: Git vs GitHub Explicado"
+                ],
+                portfolio: {
+                    title: "git_primeiro_commit.md",
+                    description: "Documente seu aprendizado sobre Git e crie variáveis para produtos da TechStore.",
+                    gitFolder: "Licao02_Variaveis_Git"
+                },
+                activities: [
+                    "Instalar Git e configurar usuário",
+                    "Inicializar repositório Git no projeto",
+                    "Criar variáveis para diferentes tipos de produtos",
+                    "Fazer primeiro commit com message descritiva"
+                ],
+                quiz: {
+                    question: "Qual comando Git salva mudanças no repositório?",
+                    options: ["git save", "git commit", "git push", "git store"],
+                    correct: 1
+                },
+                simulator: "variables-git"
+            },
+            {
+                id: 3,
+                title: "🎛️ Condições (if/elif/else) + GitHub",
+                subtitle: "Decisões Inteligentes no Código",
+                duration: "40 min",
+                icon: "🔀",
+                objective: "Implementar lógica condicional para sistemas de desconto e publicar código no GitHub.",
+                concepts: [
+                    {
+                        title: "Estruturas Condicionais",
+                        explanation: "if/elif/else permite ao programa tomar decisões. Como um fluxograma: 'se isso, então aquilo, senão isso outro'.",
+                        example: "preco = 100\nif preco >= 100:\n    desconto = 0.10\nelif preco >= 50:\n    desconto = 0.05\nelse:\n    desconto = 0\nprint(f'Desconto: {desconto*100}%')"
+                    },
+                    {
+                        title: "GitHub - Repositório Remoto",
+                        explanation: "GitHub hospeda repositórios Git na nuvem. Permite backup, colaboração e portfolio de projetos públicos.",
+                        example: "git remote add origin https://github.com/usuario/repo.git\ngit push -u origin main\n# Envia código local para GitHub"
+                    }
+                ],
+                materials: [
+                    "🌐 Tutorial: Criando Conta GitHub",
+                    "🔗 Guia: Conectando Git ao GitHub",
+                    "💡 Exemplos: Lógica Condicional Prática",
+                    "🎯 Exercício: Sistema de Descontos"
+                ],
+                portfolio: {
+                    title: "sistema_descontos.py",
+                    description: "Implemente sistema de descontos baseado no valor da compra, quantidade de itens e categoria do cliente.",
+                    gitFolder: "Licao03_Sistema_Descontos"
+                },
+                activities: [
+                    "Criar conta no GitHub",
+                    "Conectar repositório local ao GitHub",
+                    "Desenvolver sistema de descontos progressivos",
+                    "Testar diferentes cenários de desconto"
+                ],
+                quiz: {
+                    question: "Qual estrutura testa múltiplas condições?",
+                    options: ["if apenas", "if/else", "if/elif/else", "switch/case"],
+                    correct: 2
+                },
+                simulator: "conditions-logic"
+            },
+            {
+                id: 4,
+                title: "🔄 Loops (for/while) + Testes Básicos",
+                subtitle: "Automatização e Qualidade de Código",
+                duration: "45 min",
+                icon: "➰",
+                objective: "Dominar estruturas de repetição e implementar testes básicos para garantir qualidade do código.",
+                concepts: [
+                    {
+                        title: "Loops for e while",
+                        explanation: "Loops executam código repetidamente. 'for' para quantidade definida, 'while' enquanto condição for verdadeira.",
+                        example: "produtos = ['Notebook', 'Mouse', 'Teclado']\nfor produto in produtos:\n    print(f'Produto: {produto}')\n\ncontador = 1\nwhile contador <= 5:\n    print(f'Item {contador}')\n    contador += 1"
+                    },
+                    {
+                        title: "Testes Básicos",
+                        explanation: "Testes verificam se o código funciona corretamente. Previnem bugs e facilitam mudanças futuras no código.",
+                        example: "def calcular_desconto(preco, percentual):\n    return preco * (percentual / 100)\n\n# Teste simples\nassert calcular_desconto(100, 10) == 10\nprint('Teste passou!')"
+                    }
+                ],
+                materials: [
+                    "🔄 Exemplos: Loops Práticos",
+                    "🧪 Introdução: Testes Unitários",
+                    "📐 Template: Função de Teste",
+                    "⚡ Performance: Loops Eficientes"
+                ],
+                portfolio: {
+                    title: "lista_produtos.py",
+                    description: "Crie lista de produtos, implemente loops para processamento e testes para validar funcionamento.",
+                    gitFolder: "Licao04_Lista_Produtos"
+                },
+                activities: [
+                    "Criar lista com 10+ produtos da TechStore",
+                    "Implementar loop para calcular total de vendas",
+                    "Escrever testes básicos para funções",
+                    "Executar testes e corrigir eventuais erros"
+                ],
+                quiz: {
+                    question: "Qual loop é melhor para percorrer uma lista?",
+                    options: ["while apenas", "for in lista", "for range", "Tanto faz"],
+                    correct: 1
+                },
+                simulator: "loops-testing"
+            },
+            {
+                id: 5,
+                title: "⚙️ Funções + Organização de Código",
+                subtitle: "Modularização e Reutilização",
+                duration: "40 min",
+                icon: "🔧",
+                objective: "Criar funções reutilizáveis para cálculos e organizar código de forma profissional.",
+                concepts: [
+                    {
+                        title: "Definindo Funções",
+                        explanation: "Funções são blocos de código reutilizáveis. Recebem parâmetros, processam e retornam resultados.",
+                        example: "def calcular_preco_final(preco_base, desconto, imposto):\n    preco_com_desconto = preco_base * (1 - desconto/100)\n    preco_final = preco_com_desconto * (1 + imposto/100)\n    return preco_final\n\nresultado = calcular_preco_final(100, 10, 5)"
+                    },
+                    {
+                        title: "Organização de Código",
+                        explanation: "Código bem organizado usa funções pequenas, nomes claros e comentários. Facilita manutenção e trabalho em equipe.",
+                        example: "# Funções de cálculo\ndef calcular_desconto(preco, percentual):\n    '''Calcula desconto baseado no percentual'''\n    return preco * (percentual / 100)\n\ndef aplicar_imposto(valor, taxa):\n    '''Aplica taxa de imposto ao valor'''\n    return valor * (1 + taxa / 100)"
+                    }
+                ],
+                materials: [
+                    "🎯 Template: Estrutura de Funções",
+                    "📝 Guia: Documentação de Código",
+                    "🔧 Boas Práticas: Clean Code Python",
+                    "📊 Exemplos: Funções Matemáticas"
+                ],
+                portfolio: {
+                    title: "funcoes_calculos.py",
+                    description: "Desenvolva biblioteca de funções para cálculos da TechStore: preços, descontos, impostos e frete.",
+                    gitFolder: "Licao05_Funcoes_Calculos"
+                },
+                activities: [
+                    "Criar função para calcular desconto progressivo",
+                    "Implementar função de cálculo de frete",
+                    "Desenvolver função de preço final (tudo junto)",
+                    "Documentar todas as funções com docstrings"
+                ],
+                quiz: {
+                    question: "Qual palavra-chave define uma função em Python?",
+                    options: ["function", "def", "func", "define"],
+                    correct: 1
+                },
+                simulator: "functions-modular"
+            },
+            {
+                id: 6,
+                title: "📚 Estruturas de Dados + Code Review",
+                subtitle: "Organizando Informações Complexas",
+                duration: "50 min",
+                icon: "🗃️",
+                objective: "Dominar dicionários e listas para criar catálogo de produtos e praticar revisão de código.",
+                concepts: [
+                    {
+                        title: "Dicionários Python",
+                        explanation: "Dicionários armazenam dados em pares chave-valor. Ideais para representar objetos do mundo real como produtos.",
+                        example: "produto = {\n    'nome': 'Notebook Dell',\n    'preco': 2500.00,\n    'categoria': 'Informática',\n    'estoque': 15,\n    'ativo': True\n}\nprint(produto['nome'])  # Acessa pelo nome da chave"
+                    },
+                    {
+                        title: "Code Review Process",
+                        explanation: "Revisão de código melhora qualidade, encontra bugs e compartilha conhecimento. Processo essencial em equipes.",
+                        example: "# Checklist de Code Review:\n# ✓ Lógica está correta?\n# ✓ Nomes de variáveis são claros?\n# ✓ Código está bem comentado?\n# ✓ Testes estão passando?\n# ✓ Performance está adequada?"
+                    }
+                ],
+                materials: [
+                    "📖 Guia Completo: Dicionários Python",
+                    "🔍 Checklist: Code Review",
+                    "💡 Exemplos: Estruturas Aninhadas",
+                    "🛠️ Ferramentas: Linting e Formatting"
+                ],
+                portfolio: {
+                    title: "catalogo_produtos.py",
+                    description: "Construa catálogo completo da TechStore usando dicionários com produtos, categorias e funcionalidades de busca.",
+                    gitFolder: "Licao06_Catalogo_Produtos"
+                },
+                activities: [
+                    "Criar dicionário com 20+ produtos diversos",
+                    "Implementar função de busca por categoria",
+                    "Desenvolver função de filtro por preço",
+                    "Fazer review do código de um colega"
+                ],
+                quiz: {
+                    question: "Como acessar o valor 'Dell' do dict {'marca': 'Dell', 'modelo': 'XPS'}?",
+                    options: ["dict[marca]", "dict['marca']", "dict.marca", "dict(marca)"],
+                    correct: 1
+                },
+                simulator: "data-structures"
+            },
+            {
+                id: 7,
+                title: "📁 Arquivos + Documentação",
+                subtitle: "Persistência de Dados e Documentação Profissional",
+                duration: "45 min",
+                icon: "💾",
+                objective: "Implementar sistema de persistência com arquivos e criar documentação técnica completa.",
+                concepts: [
+                    {
+                        title: "Manipulação de Arquivos",
+                        explanation: "Python pode ler e escrever arquivos. Permite salvar dados permanentemente e carregar informações entre execuções.",
+                        example: "# Salvando dados\nwith open('produtos.txt', 'w') as arquivo:\n    arquivo.write('Notebook,2500.00\\n')\n    arquivo.write('Mouse,45.00\\n')\n\n# Lendo dados\nwith open('produtos.txt', 'r') as arquivo:\n    conteudo = arquivo.read()\n    print(conteudo)"
+                    },
+                    {
+                        title: "Documentação Técnica",
+                        explanation: "README, comentários e docstrings explicam como usar o código. Essencial para projetos profissionais.",
+                        example: "# README.md exemplo:\n## TechStore Calculator\n\n### Como usar:\n```python\nfrom calculadora import calcular_preco\npreco = calcular_preco(100, desconto=10)\n```\n\n### Funcionalidades:\n- Cálculo de preços\n- Sistema de descontos\n- Gestão de estoque"
+                    }
+                ],
+                materials: [
+                    "📄 Template: README.md Profissional",
+                    "💾 Guia: Trabalhando com Arquivos",
+                    "📝 Padrões: Documentação Python",
+                    "🔧 Ferramentas: Markdown e Git"
+                ],
+                portfolio: {
+                    title: "gerenciador_dados.py",
+                    description: "Desenvolva sistema completo para salvar/carregar dados de produtos em arquivos com documentação detalhada.",
+                    gitFolder: "Licao07_Gerenciador_Dados"
+                },
+                activities: [
+                    "Implementar função para salvar catálogo em arquivo",
+                    "Criar função para carregar dados de arquivo",
+                    "Escrever README.md completo do projeto",
+                    "Documentar todas as funções com docstrings"
+                ],
+                quiz: {
+                    question: "Qual modo abre arquivo para escrita?",
+                    options: ["open('file', 'r')", "open('file', 'w')", "open('file', 'a')", "open('file', 'x')"],
+                    correct: 1
+                },
+                simulator: "files-docs"
+            },
+            {
+                id: 8,
+                title: "🏆 Projeto Final: Calculadora TechStore v1.0",
+                subtitle: "Integrando Todo Conhecimento Adquirido",
+                duration: "60 min",
+                icon: "🚀",
+                objective: "Desenvolver calculadora completa integrando todos os conceitos: funções, estruturas de dados, arquivos e Git.",
+                concepts: [
+                    {
+                        title: "Integração de Sistemas",
+                        explanation: "Projeto final combina: variáveis, condições, loops, funções, dicionários, arquivos em um sistema coeso e funcional.",
+                        example: "# Estrutura do projeto final:\ntechstore_v1/\n├── calculadora.py      # Lógica principal\n├── produtos.py         # Gestão de produtos  \n├── arquivos.py         # Persistência\n├── testes.py          # Testes unitários\n├── dados/             # Arquivos de dados\n└── README.md          # Documentação"
+                    },
+                    {
+                        title: "Terminal Interface",
+                        explanation: "Interface via terminal com menu interativo. Usuário navega por opções usando input() e loops.",
+                        example: "while True:\n    print('=== TechStore Calculator ===')\n    print('1. Adicionar produto')\n    print('2. Calcular preço')\n    print('3. Ver catálogo')\n    print('0. Sair')\n    \n    opcao = input('Escolha: ')\n    if opcao == '0':\n        break"
+                    }
+                ],
+                materials: [
+                    "🎯 Especificação Completa do Projeto",
+                    "📋 Checklist: Funcionalidades Obrigatórias",
+                    "🧪 Template: Testes Automatizados",
+                    "📦 Guia: Estrutura de Projeto Python"
+                ],
+                portfolio: {
+                    title: "techstore_v1/",
+                    description: "Calculadora completa da TechStore com interface terminal, persistência de dados e sistema completo de gestão de produtos.",
+                    gitFolder: "Licao08_TechStore_v1_Final"
+                },
+                activities: [
+                    "Planejar arquitetura do sistema completo",
+                    "Implementar interface de menu interativo",
+                    "Integrar todas as funcionalidades desenvolvidas",
+                    "Criar testes automatizados para validação",
+                    "Finalizar documentação e fazer deploy no GitHub"
+                ],
+                quiz: {
+                    question: "Qual é a principal vantagem de um projeto bem estruturado?",
+                    options: ["Mais linhas de código", "Facilita manutenção e expansão", "Roda mais rápido", "Ocupa menos espaço"],
+                    correct: 1
+                },
+                simulator: "final-project"
+            }
+        ];
+
+        // Sistema de autenticação e dados
+        class DataManager {
+            constructor() {
+                // Simula Google Sheets - em produção conectaria à API real
+                this.approvedRAs = ['123456', '234567', '345678']; // RAs aprovados
+                this.adminPassword = 'admin123'; // Senha do admin
+                this.currentUser = null;
+            }
+
+            // Simula verificação no Google Sheets
+            async checkRA(ra) {
+                // Em produção: fetch para Google Sheets API
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        resolve(this.approvedRAs.includes(ra));
+                    }, 1000);
+                });
+            }
+
+            async approveRA(ra) {
+                // Em produção: update Google Sheets
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        if (!this.approvedRAs.includes(ra)) {
+                            this.approvedRAs.push(ra);
+                            resolve(true);
+                        }
+                        resolve(false);
+                    }, 500);
+                });
+            }
+
+            getApprovedRAs() {
+                return this.approvedRAs.map(ra => ({
+                    ra: ra,
+                    status: 'approved',
+                    date: new Date().toLocaleDateString()
+                }));
+            }
+
+            verifyAdmin(password) {
+                return password === this.adminPassword;
+            }
+        }
+
+        // Game state
+        let gameState = {
+            currentLesson: 1,
+            completedLessons: [],
+            unlockedLessons: [1],
+            totalXP: 0,
+            level: 1,
+            achievements: [],
+            streak: 1,
+            portfolioItems: 0,
+            activities: {},
+            quizzes: {},
+            selectedQuizOption: null
+        };
+
+        const dataManager = new DataManager();
+
+        // Initialize the application
+        function init() {
+            showLoginScreen();
+        }
+
+        // Authentication functions
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const ra = document.getElementById('raInput').value.trim();
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            
+            if (!ra) {
+                showError('Por favor, digite seu RA');
+                return;
+            }
+
+            showLoading('Verificando RA...');
+            
+            try {
+                const isApproved = await dataManager.checkRA(ra);
+                
+                if (isApproved) {
+                    dataManager.currentUser = ra;
+                    document.getElementById('userRA').textContent = `RA: ${ra}`;
+                    loadMainApp();
+                    hideMessages();
+                } else {
+                    showError('RA não autorizado. Entre em contato com o coordenador.');
+                }
+            } catch (error) {
+                showError('Erro ao verificar RA. Tente novamente.');
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function showLoading(message) {
+            showSuccess(message);
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+        }
+
+        // Admin functions
+        function showAdminPanel() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminContent').classList.add('hidden');
+        }
+
+        function verifyAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            
+            if (dataManager.verifyAdmin(password)) {
+                document.getElementById('adminContent').classList.remove('hidden');
+                loadRAList();
+                showSuccess('Acesso liberado!');
+            } else {
+                showError('Senha incorreta!');
+            }
+        }
+
+        function loadRAList() {
+            const raList = document.getElementById('raList');
+            const approvedRAs = dataManager.getApprovedRAs();
+            
+            raList.innerHTML = '';
+            
+            if (approvedRAs.length === 0) {
+                raList.innerHTML = '<p style="text-align: center; color: #666;">Nenhum RA aprovado ainda.</p>';
+                return;
+            }
+
+            approvedRAs.forEach(item => {
+                const raItem = document.createElement('div');
+                raItem.className = 'ra-item';
+                raItem.innerHTML = `
+                    <span><strong>RA:</strong> ${item.ra}</span>
+                    <span style="color: #666; font-size: 0.8rem;">${item.date}</span>
+                    <span class="ra-status approved">Aprovado</span>
+                `;
+                raList.appendChild(raItem);
+            });
+        }
+
+        async function approveRA() {
+            const newRA = document.getElementById('newRA').value.trim();
+            
+            if (!newRA) {
+                showError('Digite um RA válido');
+                return;
+            }
+
+            showLoading('Aprovando RA...');
+            
+            try {
+                const success = await dataManager.approveRA(newRA);
+                
+                if (success) {
+                    document.getElementById('newRA').value = '';
+                    loadRAList();
+                    showSuccess(`RA ${newRA} aprovado com sucesso!`);
+                } else {
+                    showError('RA já estava aprovado');
+                }
+            } catch (error) {
+                showError('Erro ao aprovar RA');
+            }
+        }
+
+        function closeAdminPanel() {
+            showLoginScreen();
+        }
+
+        function logout() {
+            dataManager.currentUser = null;
+            gameState = {
+                currentLesson: 1,
+                completedLessons: [],
+                unlockedLessons: [1],
+                totalXP: 0,
+                level: 1,
+                achievements: [],
+                streak: 1,
+                portfolioItems: 0,
+                activities: {},
+                quizzes: {},
+                selectedQuizOption: null
+            };
+            showLoginScreen();
+        }
+
+        // Main application functions
+        function loadMainApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            updateUI();
+            loadLesson(gameState.currentLesson);
+            
+            // Demo some progress for new users
+            if (gameState.totalXP === 0) {
+                gameState.totalXP = 150;
+                gameState.portfolioItems = 1;
+                gameState.completedLessons = [1];
+                gameState.unlockedLessons = [1, 2];
+                updateUI();
+            }
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function addXP(amount) {
+            const oldLevel = gameState.level;
+            gameState.totalXP += amount;
+            gameState.level = Math.floor(gameState.totalXP / 1000) + 1;
+            
+            if (gameState.level > oldLevel) {
+                showNotification(`🎉 LEVEL UP! Agora você é Level ${gameState.level}!`);
+            }
+            
+            updateUI();
+        }
+
+        function completeLesson(lessonId) {
+            if (!gameState.completedLessons.includes(lessonId)) {
+                gameState.completedLessons.push(lessonId);
+                addXP(200);
+                
+                if (lessonId < lessons.length && !gameState.unlockedLessons.includes(lessonId + 1)) {
+                    gameState.unlockedLessons.push(lessonId + 1);
+                    showNotification(`🔓 Nova lição desbloqueada!`);
+                }
+                
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            // Update header progress
+            const xpProgress = (gameState.totalXP % 1000) / 1000 * 100;
+            document.getElementById('headerXpBar').style.width = `${xpProgress}%`;
+            document.getElementById('headerXpText').textContent = `${gameState.totalXP % 1000}/1000`;
+            
+            const lessonProgress = gameState.completedLessons.length / lessons.length * 100;
+            document.getElementById('headerProgressBar').style.width = `${lessonProgress}%`;
+            document.getElementById('headerProgressText').textContent = `${gameState.completedLessons.length}/${lessons.length}`;
+            
+            document.getElementById('headerLevel').textContent = `LEVEL ${gameState.level}`;
+            
+            // Update sidebar stats
+            document.getElementById('totalXP').textContent = gameState.totalXP.toLocaleString();
+            document.getElementById('completedLessons').textContent = gameState.completedLessons.length;
+            document.getElementById('streakDays').textContent = gameState.streak;
+            document.getElementById('portfolioItems').textContent = gameState.portfolioItems;
+            document.getElementById('weeklyProgress').textContent = `${gameState.completedLessons.length}/${lessons.length} lições`;
+            
+            updateCurriculum();
+            updateAchievements();
+        }
+
+        function updateCurriculum() {
+            const container = document.getElementById('module1Lessons');
+            container.innerHTML = '';
+            
+            lessons.forEach(lesson => {
+                const isUnlocked = gameState.unlockedLessons.includes(lesson.id);
+                const isCompleted = gameState.completedLessons.includes(lesson.id);
+                const isCurrent = lesson.id === gameState.currentLesson;
+                
+                const lessonEl = document.createElement('div');
+                lessonEl.className = `lesson-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
+                
+                lessonEl.innerHTML = `
+                    <div class="lesson-icon">${lesson.icon}</div>
+                    <div class="lesson-info">
+                        <div class="lesson-title">${lesson.title}</div>
+                        <div class="lesson-duration">${lesson.duration}</div>
+                    </div>
+                    <div class="lesson-status">
+                        ${isCompleted ? '✅' : (isUnlocked ? '▶️' : '🔒')}
+                    </div>
+                `;
+                
+                if (isUnlocked) {
+                    lessonEl.addEventListener('click', () => loadLesson(lesson.id));
+                }
+                
+                container.appendChild(lessonEl);
+            });
+        }
+
+        function updateAchievements() {
+            const grid = document.getElementById('achievementsGrid');
+            grid.innerHTML = '';
+            
+            lessons.forEach(lesson => {
+                const isUnlocked = gameState.completedLessons.includes(lesson.id);
+                
+                const badge = document.createElement('div');
+                badge.className = `achievement-badge ${isUnlocked ? 'unlocked' : 'locked'}`;
+                badge.textContent = isUnlocked ? lesson.icon : '🔒';
+                badge.title = lesson.title;
+                
+                grid.appendChild(badge);
+            });
+        }
+
+        function loadLesson(lessonId) {
+            const lesson = lessons.find(l => l.id === lessonId);
+            if (!lesson || !gameState.unlockedLessons.includes(lessonId)) return;
+            
+            gameState.currentLesson = lessonId;
+            
+            // Update content
+            document.getElementById('lessonTitle').textContent = lesson.title;
+            document.getElementById('lessonSubtitle').textContent = lesson.subtitle;
+            document.getElementById('lessonObjective').textContent = lesson.objective;
+            
+            // Update sections
+            updateConcepts(lesson.concepts);
+            updateMaterials(lesson.materials);
+            updatePortfolio(lesson.portfolio);
+            updateActivities(lesson.activities, lessonId);
+            updateQuiz(lesson.quiz, lessonId);
+            updateSimulator(lesson.simulator);
+            updateNavigationButtons();
+            
+            updateUI();
+        }
+
+        function updateConcepts(concepts) {
+            const container = document.getElementById('conceptsContent');
+            container.innerHTML = '';
+            
+            concepts.forEach((concept, index) => {
+                const conceptEl = document.createElement('div');
+                conceptEl.className = 'concept-card';
+                conceptEl.innerHTML = `
+                    <h4 class="concept-title">${concept.title}</h4>
+                    <div class="concept-explanation">${concept.explanation}</div>
+                    <div class="concept-example">${concept.example}</div>
+                `;
+                
+                conceptEl.addEventListener('click', () => {
+                    speakText(`${concept.explanation}`, concept.title);
+                    addXP(5);
+                });
+                
+                container.appendChild(conceptEl);
+            });
+        }
+
+        function updateMaterials(materials) {
+            const container = document.getElementById('materialsList');
+            container.innerHTML = '';
+            
+            materials.forEach((material, index) => {
+                const materialEl = document.createElement('div');
+                materialEl.className = 'material-item';
+                materialEl.innerHTML = `
+                    <div style="font-size: 1.5rem; color: var(--accent);">📄</div>
+                    <div style="flex: 1;">
+                        <h4 style="font-weight: 600; margin-bottom: 0.3rem;">${material}</h4>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Clique para acessar</p>
+                    </div>
+                `;
+                materialEl.addEventListener('click', () => {
+                    showNotification('Material acessado! +10 XP');
+                    addXP(10);
+                });
+                container.appendChild(materialEl);
+            });
+        }
+
+        function updatePortfolio(portfolio) {
+            const container = document.getElementById('portfolioContent');
+            if (!portfolio) {
+                document.getElementById('portfolioSection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('portfolioSection').style.display = 'block';
+            container.innerHTML = `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--primary); font-weight: 600; margin-bottom: 1rem; font-size: 1.2rem;">${portfolio.title}</h3>
+                    <p style="line-height: 1.6; margin-bottom: 1.5rem;">${portfolio.description}</p>
+                    
+                    <div class="git-folder">
+                        <div class="git-folder-title">
+                            📁 Estrutura Git: <code>${portfolio.gitFolder}</code>
+                        </div>
+                        <div style="font-family: monospace; font-size: 0.9rem; line-height: 1.4; color: var(--dark-text);">
+                            <div style="margin: 0.5rem 0;">
+                                <strong>Comandos Git sugeridos:</strong><br>
+                                <code>git add .</code><br>
+                                <code>git commit -m "${portfolio.title} - Lição ${gameState.currentLesson} completa"</code><br>
+                                <code>git push origin main</code>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="sim-button" onclick="addPortfolioItem()" style="margin-top: 1rem;">
+                        💾 Salvar no Portfolio + Git
+                    </button>
+                </div>
+            `;
+        }
+
+        function addPortfolioItem() {
+            gameState.portfolioItems++;
+            addXP(50);
+            showNotification('Item adicionado ao portfolio! +50 XP');
+            updateUI();
+        }
+
+        function updateActivities(activities, lessonId) {
+            const container = document.getElementById('activitiesList');
+            container.innerHTML = '';
+            
+            activities.forEach((activity, index) => {
+                const activityId = `${lessonId}-${index}`;
+                const isCompleted = gameState.activities[activityId];
+                
+                const activityEl = document.createElement('div');
+                activityEl.className = 'activity-item';
+                activityEl.innerHTML = `
+                    <div class="activity-checkbox ${isCompleted ? 'checked' : ''}" onclick="toggleActivity('${activityId}')">
+                        ${isCompleted ? '✓' : ''}
+                    </div>
+                    <div>${activity}</div>
+                `;
+                container.appendChild(activityEl);
+            });
+        }
+
+        function toggleActivity(activityId) {
+            gameState.activities[activityId] = !gameState.activities[activityId];
+            
+            if (gameState.activities[activityId]) {
+                addXP(25);
+                showNotification('+25 XP por completar atividade!');
+            }
+            
+            const lesson = lessons.find(l => l.id === gameState.currentLesson);
+            updateActivities(lesson.activities, gameState.currentLesson);
+            checkLessonCompletion();
+        }
+
+        function updateQuiz(quiz, lessonId) {
+            const quizSection = document.getElementById('quizSection');
+            if (!quiz) {
+                quizSection.style.display = 'none';
+                return;
+            }
+            
+            quizSection.style.display = 'block';
+            document.getElementById('quizQuestion').textContent = quiz.question;
+            
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+            
+            quiz.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.className = 'quiz-option';
+                optionEl.textContent = option;
+                optionEl.addEventListener('click', () => selectQuizOption(index));
+                optionsContainer.appendChild(optionEl);
+            });
+            
+            document.getElementById('submitQuiz').onclick = () => submitQuiz(lessonId, quiz.correct);
+        }
+
+        function selectQuizOption(index) {
+            gameState.selectedQuizOption = index;
+            document.querySelectorAll('.quiz-option').forEach((option, i) => {
+                option.classList.toggle('selected', i === index);
+            });
+        }
+
+        function submitQuiz(lessonId, correctAnswer) {
+            if (gameState.selectedQuizOption === null) {
+                showNotification('Selecione uma resposta primeiro!');
+                return;
+            }
+            
+            const isCorrect = gameState.selectedQuizOption === correctAnswer;
+            gameState.quizzes[lessonId] = isCorrect;
+            
+            // Show correct/incorrect feedback
+            document.querySelectorAll('.quiz-option').forEach((option, index) => {
+                if (index === correctAnswer) {
+                    option.classList.add('correct');
+                } else if (index === gameState.selectedQuizOption && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (isCorrect) {
+                addXP(100);
+                showNotification('🎉 Resposta correta! +100 XP');
+                checkLessonCompletion();
+            } else {
+                showNotification('❌ Resposta incorreta. Tente novamente!');
+                setTimeout(() => {
+                    gameState.selectedQuizOption = null;
+                    document.querySelectorAll('.quiz-option').forEach(option => {
+                        option.classList.remove('selected', 'correct', 'incorrect');
+                    });
+                }, 2000);
+            }
+        }
+
+        function checkLessonCompletion() {
+            const lesson = lessons.find(l => l.id === gameState.currentLesson);
+            const completedActivities = lesson.activities.filter((_, index) => 
+                gameState.activities[`${gameState.currentLesson}-${index}`]
+            ).length;
+            
+            const quizCompleted = gameState.quizzes[gameState.currentLesson];
+            
+            if (completedActivities === lesson.activities.length && quizCompleted) {
+                completeLesson(gameState.currentLesson);
+            }
+        }
+
+        function updateSimulator(simulatorType) {
+            const simContent = document.getElementById('simContent');
+            
+            const simulators = {
+                'python-basic': `
+                    <div style="text-align: center;">
+                        <h4>🐍 Terminal Python Interativo</h4>
+                        <div style="background: #1e1e1e; color: #00ff00; padding: 1rem; border-radius: 8px; font-family: monospace; text-align: left; margin: 1rem 0;">
+                            Python 3.x Interactive Shell<br>
+                            >>> <span id="python-cursor">|</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
+                            <button class="sim-button" onclick="runPythonCommand('print(\\'Olá, TechStore!\\')')">print() básico</button>
+                            <button class="sim-button" onclick="runPythonCommand('nome = \\'João\\'')">Criar variável</button>
+                            <button class="sim-button" onclick="runPythonCommand('type(42)')">Verificar tipo</button>
+                            <button class="sim-button" onclick="runPythonCommand('help(print)')">Ajuda</button>
+                        </div>
+                    </div>
+                `,
+                'variables-git': `
+                    <div style="text-align: center;">
+                        <h4>💾 Laboratório: Variáveis + Git</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0;">
+                            <div>
+                                <h5>Python Variables</h5>
+                                <button class="sim-button" onclick="simulatorAction('variables-git', 'int')">int (números)</button>
+                                <button class="sim-button" onclick="simulatorAction('variables-git', 'str')">str (texto)</button>
+                                <button class="sim-button" onclick="simulatorAction('variables-git', 'float')">float (decimais)</button>
+                            </div>
+                            <div>
+                                <h5>Git Commands</h5>
+                                <button class="sim-button" onclick="simulatorAction('variables-git', 'init')">git init</button>
+                                <button class="sim-button" onclick="simulatorAction('variables-git', 'add')">git add</button>
+                                <button class="sim-button" onclick="simulatorAction('variables-git', 'commit')">git commit</button>
+                            </div>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
+                            Organize dados complexos com dicionários e listas!
+                        </div>
+                    </div>
+                `,
+                'files-docs': `
+                    <div style="text-align: center;">
+                        <h4>📁 Sistema de Arquivos</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
+                            <button class="sim-button" onclick="simulatorAction('files-docs', 'write')">Escrever Arquivo</button>
+                            <button class="sim-button" onclick="simulatorAction('files-docs', 'read')">Ler Arquivo</button>
+                            <button class="sim-button" onclick="simulatorAction('files-docs', 'json')">JSON Format</button>
+                            <button class="sim-button" onclick="simulatorAction('files-docs', 'readme')">README.md</button>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
+                            Salve e carregue dados permanentemente!
+                        </div>
+                    </div>
+                `,
+                'final-project': `
+                    <div style="text-align: center;">
+                        <h4>🏆 TechStore Calculator v1.0</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
+                            <button class="sim-button" onclick="simulatorAction('final-project', 'menu')">Menu Principal</button>
+                            <button class="sim-button" onclick="simulatorAction('final-project', 'calc')">Calculadora</button>
+                            <button class="sim-button" onclick="simulatorAction('final-project', 'save')">Salvar Dados</button>
+                            <button class="sim-button" onclick="simulatorAction('final-project', 'test')">Testes</button>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
+                            Integre todos os conceitos em um projeto completo!
+                        </div>
+                    </div>
+                `
+            };
+            
+            simContent.innerHTML = simulators[simulatorType] || simulators['python-basic'];
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevLessonBtn');
+            const nextBtn = document.getElementById('nextLessonBtn');
+            const currentId = gameState.currentLesson;
+            
+            // Previous button
+            if (currentId > 1) {
+                prevBtn.style.display = 'block';
+                prevBtn.disabled = false;
+            } else {
+                prevBtn.style.display = 'none';
+            }
+            
+            // Next button
+            if (currentId < 8) {
+                nextBtn.style.display = 'block';
+                nextBtn.textContent = 'Próxima Lição ➡️';
+                nextBtn.disabled = !gameState.unlockedLessons.includes(currentId + 1);
+            } else {
+                nextBtn.style.display = 'block';
+                nextBtn.textContent = '🏠 Voltar ao Início';
+                nextBtn.disabled = false;
+            }
+        }
+
+        function navigateLesson(direction) {
+            const currentId = gameState.currentLesson;
+            
+            if (direction === -1 && currentId > 1) {
+                loadLesson(currentId - 1);
+            } else if (direction === 1) {
+                if (currentId < 8 && gameState.unlockedLessons.includes(currentId + 1)) {
+                    loadLesson(currentId + 1);
+                } else if (currentId === 8) {
+                    loadLesson(1);
+                    showNotification('Bem-vindo de volta ao início! 🏠');
+                }
+            }
+        }
+
+        // Simulator action handlers
+        function runPythonCommand(command) {
+            const cursor = document.getElementById('python-cursor');
+            const terminal = cursor.parentElement;
+            
+            // Simulate typing
+            cursor.style.display = 'none';
+            terminal.innerHTML += `<br>>>> ${command}<br>`;
+            
+            // Simulate output based on command
+            let output = '';
+            if (command.includes('print')) {
+                const match = command.match(/print\(['"](.+?)['"]\)/);
+                output = match ? match[1] : 'Hello, World!';
+            } else if (command.includes('type(')) {
+                output = "&lt;class 'int'&gt;";
+            } else if (command.includes('help(')) {
+                output = 'Help on built-in function print...';
+            } else if (command.includes('=')) {
+                output = ''; // Variable assignment has no output
+            }
+            
+            if (output) {
+                terminal.innerHTML += `${output}<br>`;
+            }
+            
+            terminal.innerHTML += `>>> <span id="python-cursor">|</span>`;
+            addXP(10);
+        }
+
+            function calculateDiscount() {
+                const price = parseFloat(document.getElementById('sim-price').value) || 0;
+                const category = document.getElementById('sim-category').value;
+                
+                let discount = 0;
+                let categoryBonus = 0;
+                
+                // Level-based discount (game context)
+                if (price >= 500) {
+                    discount = 15;  // High level items
+                } else if (price >= 200) {
+                    discount = 10;  // Medium level items
+                } else if (price >= 100) {
+                    discount = 5;   // Low level items
+                }
+                
+                // Player category bonus
+                switch(category) {
+                    case 'ouro': categoryBonus = 5; break;    // Gold player
+                    case 'prata': categoryBonus = 2; break;   // Silver player  
+                    case 'bronze': categoryBonus = 0; break;  // Bronze player
+                }
+                
+                const totalDiscount = discount + categoryBonus;
+                const finalPrice = price * (1 - totalDiscount/100);
+                
+                const feedback = document.getElementById('sim-feedback');
+                feedback.innerHTML = `
+                    <strong>Game Logic Resultado:</strong><br>
+                    Valor do item: ${price.toFixed(2)} moedas<br>
+                    Desconto por nível: ${discount}%<br>
+                    Bônus jogador ${category}: ${categoryBonus}%<br>
+                    Desconto total: ${totalDiscount}%<br>
+                    <strong>Preço final: ${finalPrice.toFixed(2)} moedas</strong>
+                `;
+                
+                addXP(15);
+            }
+
+        function simulatorAction(simulatorType, action) {
+            const explanations = {
+                'variables-git': {
+                    'int': 'vida_jogador = 100  # Número inteiro\nprint(type(vida_jogador))  # <class \'int\'>',
+                    'str': 'nome_heroi = "DragonSlayer"  # String (texto)\nprint(len(nome_heroi))  # 11 caracteres',
+                    'float': 'velocidade = 5.5  # Número decimal\nprint(f"Velocidade: {velocidade}")  # Velocidade: 5.5',
+                    'init': 'git init  # Inicializa repositório Git\n# Cria pasta .git para versionar seu jogo',
+                    'add': 'git add .  # Adiciona todos os arquivos do jogo\n# Prepara código do jogo para commit',
+                    'commit': 'git commit -m "Sistema de vida implementado"  # Salva alterações\n# Cria snapshot do projeto de jogo'
+                },
+                'loops-testing': {
+                    'for': 'inimigos = ["Goblin", "Orc", "Dragon"]\nfor inimigo in inimigos:\n    print(f"Spawning: {inimigo}")',
+                    'while': 'vida = 100\nwhile vida > 0:\n    print(f"Jogador vivo: {vida} HP")\n    vida -= 20  # Toma dano',
+                    'test': 'def calcular_dano(ataque, defesa):\n    return max(0, ataque - defesa)\n\nassert calcular_dano(50, 20) == 30\nprint("Sistema de combate OK!")',
+                    'list': 'inventario = ["Espada", "Poção", "Escudo", "Moeda"]\nprint(f"Itens no inventário: {len(inventario)}")'
+                },
+                'functions-modular': {
+                    'define': 'def calcular_experiencia(nivel_inimigo, bonus=1.0):\n    """Calcula XP ganho ao derrotar inimigo"""\n    return int(nivel_inimigo * 100 * bonus)',
+                    'params': 'def criar_personagem(nome, classe="Guerreiro"):\n    """Cria personagem com classe opcional"""\n    return f"{nome} the {classe}"',
+                    'return': 'def level_up_check(xp_atual, xp_necessario):\n    if xp_atual >= xp_necessario: \n        return True, xp_atual - xp_necessario\n    return False, 0',
+                    'doc': 'def processar_combate(atacante, defensor):\n    """\n    Processa round de combate\n    \n    Args:\n        atacante (dict): Stats do atacante\n        defensor (dict): Stats do defensor\n    \n    Returns:\n        dict: Resultado do combate\n    """'
+                },
+                'data-structures': {
+                    'dict': 'jogador = {\n    "nome": "Herói",\n    "vida": 100,\n    "mana": 50,\n    "nivel": 5,\n    "classe": "Mago"\n}',
+                    'list': 'inventario = ["Espada Mágica", "Poção de Vida", "Anel de Poder"]\nhabilidades = ["Fireball", "Heal", "Lightning"]',
+                    'access': 'print(jogador["vida"])  # 100\nprint(inventario[0])  # Espada Mágica\njogador["vida"] = 80  # Toma dano',
+                    'nested': 'jogo = {\n    "jogador": {\n        "nome": "Herói",\n        "stats": {"vida": 100, "mana": 50}\n    },\n    "inimigos": [\n        {"nome": "Goblin", "vida": 30},\n        {"nome": "Dragon", "vida": 200}\n    ]\n}'
+                },
+                'files-docs': {
+                    'write': 'import json\nsave_data = {"nivel": 5, "vida": 80, "pontuacao": 2500}\nwith open("savegame.json", "w") as f:\n    json.dump(save_data, f)',
+                    'read': 'with open("savegame.json", "r") as f:\n    progresso = json.load(f)\n    print(f"Nível carregado: {progresso["nivel"]}")',
+                    'json': 'config_jogo = {\n    "dificuldade": "Normal",\n    "volume": 0.8,\n    "controles": {"pular": "SPACE", "atacar": "X"}\n}',
+                    'readme': '# Meu Primeiro Jogo\n\n## Como jogar:\n```python\nfrom jogo import iniciar_aventura\niniciar_aventura()\n```\n\n## Controles:\n- WASD: Movimento\n- Espaço: Pular'
+                },
+                'final-project': {
+                    'menu': 'def menu_principal():\n    print("=== GameEngine v1.0 ===")\n    print("1. Nova aventura")\n    print("2. Carregar jogo")\n    print("3. Configurações")\n    print("0. Sair")',
+                    'calc': 'def processar_combate(ataque_jogador, defesa_inimigo):\n    dano = max(0, ataque_jogador - defesa_inimigo)\n    critico = random.random() < 0.1  # 10% chance\n    return dano * 2 if critico else dano',
+                    'save': 'def salvar_progresso(jogador, nivel_atual):\n    save_data = {\n        "jogador": jogador,\n        "nivel": nivel_atual,\n        "timestamp": time.time()\n    }\n    with open("save.json", "w") as f:\n        json.dump(save_data, f)',
+                    'test': 'def test_sistema_combate():\n    dano = processar_combate(50, 20)\n    assert dano >= 30  # Dano mínimo\n    assert dano <= 60  # Dano máximo com crítico\n    print("Sistema de combate validado!")'
+                }
+            };
+            
+            const feedback = explanations[simulatorType]?.[action] || 'Funcionalidade em desenvolvimento...';
+            const feedbackEl = document.getElementById('sim-feedback');
+            if (feedbackEl) {
+                feedbackEl.textContent = feedback;
+            }
+            
+            addXP(10);
+            showNotification('🐍 +10 XP por explorar Python!');
+        }
+
+        // Text-to-Speech functions
+        function speakText(text, context = '') {
+            const indicator = document.getElementById('speakingIndicator');
+            const message = document.getElementById('mentorMessage');
+            
+            indicator.classList.add('active');
+            message.textContent = `Explicando: ${context || text.substring(0, 50)}...`;
+            
+            setTimeout(() => {
+                indicator.classList.remove('active');
+                message.textContent = 'Explicação concluída! Clique em outras seções ou no botão "Ler toda a lição".';
+            }, 3000);
+            
+            addXP(5);
+        }
+
+        function speakObjective() {
+            const lesson = lessons.find(l => l.id === gameState.currentLesson);
+            if (lesson) {
+                speakText(lesson.objective, 'Objetivo da Lição');
+            }
+        }
+
+        function speakSection(section) {
+            const lesson = lessons.find(l => l.id === gameState.currentLesson);
+            if (!lesson) return;
+            
+            if (section === 'concepts') {
+                const text = lesson.concepts.map(c => `${c.title}: ${c.explanation}`).join(' ');
+                speakText(text, 'Conceitos Fundamentais');
+            }
+        }
+
+        function speakFullLesson() {
+            const lesson = lessons.find(l => l.id === gameState.currentLesson);
+            if (!lesson) return;
+            
+            let fullText = `Bem-vindo à lição ${lesson.title}. `;
+            fullText += `Objetivo: ${lesson.objective} `;
+            fullText += lesson.concepts.map(c => `${c.title}: ${c.explanation}`).join(' ');
+            
+            speakText(fullText, 'Lição Completa');
+            addXP(25);
+        }
+
+        function stopSpeech() {
+            const indicator = document.getElementById('speakingIndicator');
+            const message = document.getElementById('mentorMessage');
+            
+            indicator.classList.remove('active');
+            message.textContent = 'Narração parada. Clique em qualquer seção para eu explicar!';
+        }
+
+        function changeSpeed() {
+            showNotification('Velocidade de narração alterada!');
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // Audio controls
+            document.getElementById('playBtn').addEventListener('click', speakObjective);
+            document.getElementById('stopBtn').addEventListener('click', stopSpeech);
+            document.getElementById('speedBtn').addEventListener('click', changeSpeed);
+            document.getElementById('readAllBtn').addEventListener('click', speakFullLesson);
+            
+            // Initialize application
+            init();
+        });
+
+        // Make functions global for onclick handlers
+        window.showAdminPanel = showAdminPanel;
+        window.verifyAdminPassword = verifyAdminPassword;
+        window.approveRA = approveRA;
+        window.closeAdminPanel = closeAdminPanel;
+        window.logout = logout;
+        window.addPortfolioItem = addPortfolioItem;
+        window.toggleActivity = toggleActivity;
+        window.navigateLesson = navigateLesson;
+        window.simulatorAction = simulatorAction;
+        window.runPythonCommand = runPythonCommand;
+        window.calculateDiscount = calculateDiscount;
+        window.speakObjective = speakObjective;
+        window.speakSection = speakSection;
+        window.speakFullLesson = speakFullLesson;
+        window.stopSpeech = stopSpeech;
+        window.changeSpeed = changeSpeed;
+    </script>
+</body>
+</html>
+                            Clique nos botões para explorar Python e Git!
+                        </div>
+                    </div>
+                `,
+                'conditions-logic': `
+                    <div style="text-align: center;">
+                        <h4>🔀 Simulador de Descontos</h4>
+                        <div style="margin: 2rem 0;">
+                            <label>Valor da Compra: R$ <input type="number" id="sim-price" value="100" style="padding: 0.5rem; margin: 0.5rem;"></label><br>
+                            <label>Categoria Cliente: 
+                                <select id="sim-category" style="padding: 0.5rem; margin: 0.5rem;">
+                                    <option value="bronze">Bronze</option>
+                                    <option value="prata">Prata</option>
+                                    <option value="ouro">Ouro</option>
+                                </select>
+                            </label><br>
+                            <button class="sim-button" onclick="calculateDiscount()">Calcular Desconto</button>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px;">
+                            Configure os valores e clique para ver a lógica condicional em ação!
+                        </div>
+                    </div>
+                `,
+                'loops-testing': `
+                    <div style="text-align: center;">
+                        <h4>🔄 Laboratório de Loops</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
+                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'for')">Loop for</button>
+                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'while')">Loop while</button>
+                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'test')">Teste Simples</button>
+                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'list')">Lista de Produtos</button>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
+                            Explore diferentes tipos de loops e testes!
+                        </div>
+                    </div>
+                `,
+                'functions-modular': `
+                    <div style="text-align: center;">
+                        <h4>⚙️ Workshop de Funções</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
+                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'define')">def função()</button>
+                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'params')">Parâmetros</button>
+                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'return')">return valor</button>
+                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'doc')">Docstrings</button>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
+                            Construa funções modulares e reutilizáveis!
+                        </div>
+                    </div>
+                `,
+                'data-structures': `
+                    <div style="text-align: center;">
+                        <h4>🗃️ Estruturas de Dados</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
+                            <button class="sim-button" onclick="simulatorAction('data-structures', 'dict')">Dicionários</button>
+                            <button class="sim-button" onclick="simulatorAction('data-structures', 'list')">Listas</button>
+                            <button class="sim-button" onclick="simulatorAction('data-structures', 'access')">Acessar Dados</button>
+                            <button class="sim-button" onclick="simulatorAction('data-structures', 'nested')">Estruturas Aninhadas</button>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
