@@ -1013,6 +1013,12 @@
                 <div class="ra-list" id="raList">
                     <p style="text-align: center; color: #666;">Carregando lista de RAs...</p>
                 </div>
+
+                <div id="progressStatsSection" class="hidden" style="margin-top: 2rem;">
+                    <h4 style="color: var(--primary); margin: 1.5rem 0 1rem 0;">📊 Estatísticas de Progresso</h4>
+                    <button onclick="showProgressStats()" class="sim-button">Ver Estatísticas</button>
+                    <div id="progressStats" style="margin-top: 1rem; display: none;"></div>
+                </div>
             </div>
             
             <button onclick="closeAdminPanel()" class="admin-button" style="margin-top: 1rem;">
@@ -1617,6 +1623,99 @@
             }
         }
 
+        // ===== FUNÇÕES DE PERSISTÊNCIA DE PROGRESSO =====
+        
+        // Funções de persistência de dados
+        function saveProgress(ra, gameState) {
+            try {
+                const key = `gameProgress_${ra}`;
+                const data = {
+                    ...gameState,
+                    lastAccess: new Date().toISOString(),
+                    version: '1.0' // Para futuras migrações de dados
+                };
+                localStorage.setItem(key, JSON.stringify(data));
+                console.log('Progresso salvo para RA:', ra);
+            } catch (error) {
+                console.error('Erro ao salvar progresso:', error);
+                showNotification('Erro ao salvar progresso');
+            }
+        }
+
+        function loadProgress(ra) {
+            try {
+                const key = `gameProgress_${ra}`;
+                const savedData = localStorage.getItem(key);
+                
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    // Remove campos temporários que não devem persistir
+                    delete data.selectedQuizOption;
+                    delete data.version;
+                    delete data.lastAccess;
+                    
+                    console.log('Progresso carregado para RA:', ra);
+                    return data;
+                }
+                
+                console.log('Nenhum progresso salvo encontrado para RA:', ra);
+                return null;
+            } catch (error) {
+                console.error('Erro ao carregar progresso:', error);
+                showNotification('Erro ao carregar progresso salvo');
+                return null;
+            }
+        }
+
+        function clearProgress(ra) {
+            try {
+                const key = `gameProgress_${ra}`;
+                localStorage.removeItem(key);
+                console.log('Progresso limpo para RA:', ra);
+            } catch (error) {
+                console.error('Erro ao limpar progresso:', error);
+            }
+        }
+
+        // Função auxiliar para salvar o progresso atual
+        function saveCurrentProgress() {
+            if (dataManager.currentUser) {
+                saveProgress(dataManager.currentUser, gameState);
+            }
+        }
+
+        // Função para obter estatísticas detalhadas (para admin)
+        function getDetailedStats() {
+            const allRAs = dataManager.getApprovedRAs();
+            const stats = {
+                totalStudents: allRAs.length,
+                activeStudents: 0,
+                completionRates: [],
+                avgXP: 0,
+                totalXP: 0
+            };
+            
+            allRAs.forEach(raItem => {
+                const progress = loadProgress(raItem.ra);
+                if (progress) {
+                    stats.activeStudents++;
+                    stats.completionRates.push(progress.completedLessons.length);
+                    stats.totalXP += progress.totalXP;
+                }
+            });
+            
+            if (stats.activeStudents > 0) {
+                stats.avgXP = Math.round(stats.totalXP / stats.activeStudents);
+                stats.avgCompletion = Math.round(
+                    stats.completionRates.reduce((a, b) => a + b, 0) / stats.activeStudents
+                );
+            }
+            
+            return stats;
+        }
+
+        // ===== FIM DAS FUNÇÕES DE PERSISTÊNCIA =====
+
         // Game state
         let gameState = {
             currentLesson: 1,
@@ -1646,11 +1745,10 @@
             document.getElementById('adminPanel').classList.add('hidden');
         }
 
+        // MODIFICADO: Função handleLogin com carregamento de progresso
         async function handleLogin(event) {
             event.preventDefault();
             const ra = document.getElementById('raInput').value.trim();
-            const errorDiv = document.getElementById('errorMessage');
-            const successDiv = document.getElementById('successMessage');
             
             if (!ra) {
                 showError('Por favor, digite seu RA');
@@ -1665,6 +1763,14 @@
                 if (isApproved) {
                     dataManager.currentUser = ra;
                     document.getElementById('userRA').textContent = `RA: ${ra}`;
+                    
+                    // NOVO: Carregar progresso salvo
+                    const savedProgress = loadProgress(ra);
+                    if (savedProgress) {
+                        gameState = { ...gameState, ...savedProgress };
+                        showNotification('🎉 Progresso anterior carregado! Bem-vindo de volta!');
+                    }
+                    
                     loadMainApp();
                     hideMessages();
                 } else {
@@ -1711,6 +1817,7 @@
             
             if (dataManager.verifyAdmin(password)) {
                 document.getElementById('adminContent').classList.remove('hidden');
+                document.getElementById('progressStatsSection').classList.remove('hidden');
                 loadRAList();
                 showSuccess('Acesso liberado!');
             } else {
@@ -1770,7 +1877,13 @@
             showLoginScreen();
         }
 
+        // MODIFICADO: Função logout com salvamento
         function logout() {
+            // Salva o progresso antes de sair
+            if (dataManager.currentUser) {
+                saveCurrentProgress();
+            }
+            
             dataManager.currentUser = null;
             gameState = {
                 currentLesson: 1,
@@ -1788,6 +1901,24 @@
             showLoginScreen();
         }
 
+        // NOVO: Função para mostrar estatísticas no admin
+        function showProgressStats() {
+            const stats = getDetailedStats();
+            const statsDiv = document.getElementById('progressStats');
+            
+            statsDiv.innerHTML = `
+                <div style="background: var(--light-bg); padding: 1rem; border-radius: 8px;">
+                    <strong>Estatísticas Gerais:</strong><br>
+                    👥 Total de Alunos: ${stats.totalStudents}<br>
+                    🎯 Alunos Ativos: ${stats.activeStudents}<br>
+                    📈 XP Médio: ${stats.avgXP}<br>
+                    ✅ Lições Médias Completas: ${stats.avgCompletion || 0}/8<br>
+                </div>
+            `;
+            
+            statsDiv.style.display = 'block';
+        }
+
         // Main application functions
         function loadMainApp() {
             document.getElementById('loginScreen').classList.add('hidden');
@@ -1795,14 +1926,7 @@
             updateUI();
             loadLesson(gameState.currentLesson);
             
-            // Demo some progress for new users
-            if (gameState.totalXP === 0) {
-                gameState.totalXP = 150;
-                gameState.portfolioItems = 1;
-                gameState.completedLessons = [1];
-                gameState.unlockedLessons = [1, 2];
-                updateUI();
-            }
+            // REMOVIDO: Demo progress (agora usa dados reais salvos)
         }
 
         function showNotification(message) {
@@ -1814,6 +1938,7 @@
             }, 3000);
         }
 
+        // MODIFICADO: Função addXP com salvamento automático
         function addXP(amount) {
             const oldLevel = gameState.level;
             gameState.totalXP += amount;
@@ -1824,8 +1949,10 @@
             }
             
             updateUI();
+            saveCurrentProgress(); // NOVO: Salva automaticamente
         }
 
+        // MODIFICADO: Função completeLesson com salvamento automático
         function completeLesson(lessonId) {
             if (!gameState.completedLessons.includes(lessonId)) {
                 gameState.completedLessons.push(lessonId);
@@ -1837,6 +1964,7 @@
                 }
                 
                 updateUI();
+                saveCurrentProgress(); // NOVO: Salva automaticamente
             }
         }
 
@@ -1910,6 +2038,7 @@
             });
         }
 
+        // MODIFICADO: Função loadLesson com salvamento automático
         function loadLesson(lessonId) {
             const lesson = lessons.find(l => l.id === lessonId);
             if (!lesson || !gameState.unlockedLessons.includes(lessonId)) return;
@@ -1931,6 +2060,7 @@
             updateNavigationButtons();
             
             updateUI();
+            saveCurrentProgress(); // NOVO: Salva automaticamente
         }
 
         function updateConcepts(concepts) {
@@ -2011,11 +2141,13 @@
             `;
         }
 
+        // MODIFICADO: Função addPortfolioItem com salvamento automático
         function addPortfolioItem() {
             gameState.portfolioItems++;
             addXP(50);
             showNotification('Item adicionado ao portfolio! +50 XP');
             updateUI();
+            saveCurrentProgress(); // NOVO: Salva automaticamente
         }
 
         function updateActivities(activities, lessonId) {
@@ -2038,6 +2170,7 @@
             });
         }
 
+        // MODIFICADO: Função toggleActivity com salvamento automático
         function toggleActivity(activityId) {
             gameState.activities[activityId] = !gameState.activities[activityId];
             
@@ -2049,6 +2182,7 @@
             const lesson = lessons.find(l => l.id === gameState.currentLesson);
             updateActivities(lesson.activities, gameState.currentLesson);
             checkLessonCompletion();
+            saveCurrentProgress(); // NOVO: Salva automaticamente
         }
 
         function updateQuiz(quiz, lessonId) {
@@ -2082,6 +2216,7 @@
             });
         }
 
+        // MODIFICADO: Função submitQuiz com salvamento automático
         function submitQuiz(lessonId, correctAnswer) {
             if (gameState.selectedQuizOption === null) {
                 showNotification('Selecione uma resposta primeiro!');
@@ -2104,6 +2239,7 @@
                 addXP(100);
                 showNotification('🎉 Resposta correta! +100 XP');
                 checkLessonCompletion();
+                saveCurrentProgress(); // NOVO: Salva automaticamente
             } else {
                 showNotification('❌ Resposta incorreta. Tente novamente!');
                 setTimeout(() => {
@@ -2163,6 +2299,67 @@
                                 <button class="sim-button" onclick="simulatorAction('variables-git', 'add')">git add</button>
                                 <button class="sim-button" onclick="simulatorAction('variables-git', 'commit')">git commit</button>
                             </div>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
+                            Organize dados complexos com dicionários e listas!
+                        </div>
+                    </div>
+                `,
+                'conditions-logic': `
+                    <div style="text-align: center;">
+                        <h4>🔀 Simulador de Descontos</h4>
+                        <div style="margin: 2rem 0;">
+                            <label>Valor da Compra: R$ <input type="number" id="sim-price" value="100" style="padding: 0.5rem; margin: 0.5rem;"></label><br>
+                            <label>Categoria Cliente: 
+                                <select id="sim-category" style="padding: 0.5rem; margin: 0.5rem;">
+                                    <option value="bronze">Bronze</option>
+                                    <option value="prata">Prata</option>
+                                    <option value="ouro">Ouro</option>
+                                </select>
+                            </label><br>
+                            <button class="sim-button" onclick="calculateDiscount()">Calcular Desconto</button>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px;">
+                            Configure os valores e clique para ver a lógica condicional em ação!
+                        </div>
+                    </div>
+                `,
+                'loops-testing': `
+                    <div style="text-align: center;">
+                        <h4>🔄 Laboratório de Loops</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
+                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'for')">Loop for</button>
+                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'while')">Loop while</button>
+                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'test')">Teste Simples</button>
+                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'list')">Lista de Produtos</button>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
+                            Explore diferentes tipos de loops e testes!
+                        </div>
+                    </div>
+                `,
+                'functions-modular': `
+                    <div style="text-align: center;">
+                        <h4>⚙️ Workshop de Funções</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
+                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'define')">def função()</button>
+                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'params')">Parâmetros</button>
+                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'return')">return valor</button>
+                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'doc')">Docstrings</button>
+                        </div>
+                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
+                            Construa funções modulares e reutilizáveis!
+                        </div>
+                    </div>
+                `,
+                'data-structures': `
+                    <div style="text-align: center;">
+                        <h4>🗃️ Estruturas de Dados</h4>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
+                            <button class="sim-button" onclick="simulatorAction('data-structures', 'dict')">Dicionários</button>
+                            <button class="sim-button" onclick="simulatorAction('data-structures', 'list')">Listas</button>
+                            <button class="sim-button" onclick="simulatorAction('data-structures', 'access')">Acessar Dados</button>
+                            <button class="sim-button" onclick="simulatorAction('data-structures', 'nested')">Estruturas Aninhadas</button>
                         </div>
                         <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
                             Organize dados complexos com dicionários e listas!
@@ -2272,44 +2469,44 @@
             addXP(10);
         }
 
-            function calculateDiscount() {
-                const price = parseFloat(document.getElementById('sim-price').value) || 0;
-                const category = document.getElementById('sim-category').value;
-                
-                let discount = 0;
-                let categoryBonus = 0;
-                
-                // Level-based discount (game context)
-                if (price >= 500) {
-                    discount = 15;  // High level items
-                } else if (price >= 200) {
-                    discount = 10;  // Medium level items
-                } else if (price >= 100) {
-                    discount = 5;   // Low level items
-                }
-                
-                // Player category bonus
-                switch(category) {
-                    case 'ouro': categoryBonus = 5; break;    // Gold player
-                    case 'prata': categoryBonus = 2; break;   // Silver player  
-                    case 'bronze': categoryBonus = 0; break;  // Bronze player
-                }
-                
-                const totalDiscount = discount + categoryBonus;
-                const finalPrice = price * (1 - totalDiscount/100);
-                
-                const feedback = document.getElementById('sim-feedback');
-                feedback.innerHTML = `
-                    <strong>Game Logic Resultado:</strong><br>
-                    Valor do item: ${price.toFixed(2)} moedas<br>
-                    Desconto por nível: ${discount}%<br>
-                    Bônus jogador ${category}: ${categoryBonus}%<br>
-                    Desconto total: ${totalDiscount}%<br>
-                    <strong>Preço final: ${finalPrice.toFixed(2)} moedas</strong>
-                `;
-                
-                addXP(15);
+        function calculateDiscount() {
+            const price = parseFloat(document.getElementById('sim-price').value) || 0;
+            const category = document.getElementById('sim-category').value;
+            
+            let discount = 0;
+            let categoryBonus = 0;
+            
+            // Level-based discount (game context)
+            if (price >= 500) {
+                discount = 15;  // High level items
+            } else if (price >= 200) {
+                discount = 10;  // Medium level items
+            } else if (price >= 100) {
+                discount = 5;   // Low level items
             }
+            
+            // Player category bonus
+            switch(category) {
+                case 'ouro': categoryBonus = 5; break;    // Gold player
+                case 'prata': categoryBonus = 2; break;   // Silver player  
+                case 'bronze': categoryBonus = 0; break;  // Bronze player
+            }
+            
+            const totalDiscount = discount + categoryBonus;
+            const finalPrice = price * (1 - totalDiscount/100);
+            
+            const feedback = document.getElementById('sim-feedback');
+            feedback.innerHTML = `
+                <strong>Game Logic Resultado:</strong><br>
+                Valor do item: ${price.toFixed(2)} moedas<br>
+                Desconto por nível: ${discount}%<br>
+                Bônus jogador ${category}: ${categoryBonus}%<br>
+                Desconto total: ${totalDiscount}%<br>
+                <strong>Preço final: ${finalPrice.toFixed(2)} moedas</strong>
+            `;
+            
+            addXP(15);
+        }
 
         function simulatorAction(simulatorType, action) {
             const explanations = {
@@ -2420,6 +2617,13 @@
             showNotification('Velocidade de narração alterada!');
         }
 
+        // Backup automático a cada 5 minutos
+        setInterval(() => {
+            if (dataManager.currentUser) {
+                saveCurrentProgress();
+            }
+        }, 5 * 60 * 1000); // 5 minutos
+
         // Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Login form
@@ -2452,67 +2656,7 @@
         window.speakFullLesson = speakFullLesson;
         window.stopSpeech = stopSpeech;
         window.changeSpeed = changeSpeed;
+        window.showProgressStats = showProgressStats;
     </script>
 </body>
 </html>
-                            Clique nos botões para explorar Python e Git!
-                        </div>
-                    </div>
-                `,
-                'conditions-logic': `
-                    <div style="text-align: center;">
-                        <h4>🔀 Simulador de Descontos</h4>
-                        <div style="margin: 2rem 0;">
-                            <label>Valor da Compra: R$ <input type="number" id="sim-price" value="100" style="padding: 0.5rem; margin: 0.5rem;"></label><br>
-                            <label>Categoria Cliente: 
-                                <select id="sim-category" style="padding: 0.5rem; margin: 0.5rem;">
-                                    <option value="bronze">Bronze</option>
-                                    <option value="prata">Prata</option>
-                                    <option value="ouro">Ouro</option>
-                                </select>
-                            </label><br>
-                            <button class="sim-button" onclick="calculateDiscount()">Calcular Desconto</button>
-                        </div>
-                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px;">
-                            Configure os valores e clique para ver a lógica condicional em ação!
-                        </div>
-                    </div>
-                `,
-                'loops-testing': `
-                    <div style="text-align: center;">
-                        <h4>🔄 Laboratório de Loops</h4>
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
-                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'for')">Loop for</button>
-                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'while')">Loop while</button>
-                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'test')">Teste Simples</button>
-                            <button class="sim-button" onclick="simulatorAction('loops-testing', 'list')">Lista de Produtos</button>
-                        </div>
-                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
-                            Explore diferentes tipos de loops e testes!
-                        </div>
-                    </div>
-                `,
-                'functions-modular': `
-                    <div style="text-align: center;">
-                        <h4>⚙️ Workshop de Funções</h4>
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
-                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'define')">def função()</button>
-                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'params')">Parâmetros</button>
-                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'return')">return valor</button>
-                            <button class="sim-button" onclick="simulatorAction('functions-modular', 'doc')">Docstrings</button>
-                        </div>
-                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
-                            Construa funções modulares e reutilizáveis!
-                        </div>
-                    </div>
-                `,
-                'data-structures': `
-                    <div style="text-align: center;">
-                        <h4>🗃️ Estruturas de Dados</h4>
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 2rem 0;">
-                            <button class="sim-button" onclick="simulatorAction('data-structures', 'dict')">Dicionários</button>
-                            <button class="sim-button" onclick="simulatorAction('data-structures', 'list')">Listas</button>
-                            <button class="sim-button" onclick="simulatorAction('data-structures', 'access')">Acessar Dados</button>
-                            <button class="sim-button" onclick="simulatorAction('data-structures', 'nested')">Estruturas Aninhadas</button>
-                        </div>
-                        <div id="sim-feedback" style="margin-top: 1rem; padding: 1rem; background: var(--light-bg); border-radius: 8px; font-family: monospace;">
