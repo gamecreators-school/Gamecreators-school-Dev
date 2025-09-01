@@ -1610,6 +1610,20 @@
                 });
             }
 
+            async removeRA(ra) {
+                // Em produção: remove from Google Sheets
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const index = this.approvedRAs.indexOf(ra);
+                        if (index > -1) {
+                            this.approvedRAs.splice(index, 1);
+                            resolve(true);
+                        }
+                        resolve(false);
+                    }, 500);
+                });
+            }
+
             getApprovedRAs() {
                 return this.approvedRAs.map(ra => ({
                     ra: ra,
@@ -1840,9 +1854,18 @@
                 const raItem = document.createElement('div');
                 raItem.className = 'ra-item';
                 raItem.innerHTML = `
-                    <span><strong>RA:</strong> ${item.ra}</span>
-                    <span style="color: #666; font-size: 0.8rem;">${item.date}</span>
-                    <span class="ra-status approved">Aprovado</span>
+                    <div style="flex: 1;">
+                        <span><strong>RA:</strong> ${item.ra}</span>
+                        <span style="color: #666; font-size: 0.8rem; display: block;">${item.date}</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="ra-status approved">Aprovado</span>
+                        <button onclick="removeRA('${item.ra}')" class="approve-button" 
+                                style="background: var(--error); font-size: 0.7rem; padding: 0.3rem 0.6rem;"
+                                title="Excluir RA (Remove acesso e apaga progresso)">
+                            🗑️ Excluir
+                        </button>
+                    </div>
                 `;
                 raList.appendChild(raItem);
             });
@@ -1870,6 +1893,45 @@
                 }
             } catch (error) {
                 showError('Erro ao aprovar RA');
+            }
+        }
+
+        async function removeRA(ra) {
+            // Confirmação antes de excluir
+            const confirmMessage = `⚠️ ATENÇÃO!\n\nTem certeza que deseja EXCLUIR o RA ${ra}?\n\nIsto irá:\n✗ Remover acesso ao sistema\n✗ Apagar todo progresso salvo\n✗ Não poderá ser desfeito\n\nDigite "EXCLUIR" para confirmar:`;
+            
+            const confirmation = prompt(confirmMessage);
+            
+            if (confirmation !== 'EXCLUIR') {
+                showError('Exclusão cancelada. Digite exatamente "EXCLUIR" para confirmar.');
+                return;
+            }
+            
+            showLoading('Excluindo RA...');
+            
+            try {
+                const success = await dataManager.removeRA(ra);
+                
+                if (success) {
+                    // Limpar dados de progresso do aluno
+                    clearProgress(ra);
+                    
+                    // Se for o usuário atual logado, fazer logout
+                    if (dataManager.currentUser === ra) {
+                        showNotification('⚠️ Seu acesso foi removido. Redirecionando...');
+                        setTimeout(() => {
+                            logout();
+                        }, 2000);
+                        return;
+                    }
+                    
+                    loadRAList();
+                    showSuccess(`RA ${ra} excluído com sucesso!`);
+                } else {
+                    showError('Erro: RA não encontrado');
+                }
+            } catch (error) {
+                showError('Erro ao excluir RA');
             }
         }
 
@@ -2642,6 +2704,7 @@
         window.showAdminPanel = showAdminPanel;
         window.verifyAdminPassword = verifyAdminPassword;
         window.approveRA = approveRA;
+        window.removeRA = removeRA;
         window.closeAdminPanel = closeAdminPanel;
         window.logout = logout;
         window.addPortfolioItem = addPortfolioItem;
